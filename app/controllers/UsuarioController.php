@@ -7,7 +7,7 @@ use App\middleware\Middle;
 $json = file_get_contents('php://input');
 $dados = json_decode($json);
 
-$token = apache_request_headers(); 
+$token = apache_request_headers();
 Middle::validacao($token);
 
 function listarUsuarios()

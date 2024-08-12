@@ -105,14 +105,14 @@ function alterarProduto($id, $codigo, $nome, $valor_unitario, $valor_venda, $cat
             $retorno['erro'] = "Todos os campos são obrigatórios";
         } else {
             $model = new ProdutoModel($id, $codigo, $nome, $valor_unitario, $valor_venda, $categoria, $tamanho, $quantidade_minima, $descricao);
-            $verificar = $model->verificarProduto();
-            if ($verificar) {
-                http_response_code(400);
-                $retorno['erro'] = "Produto já cadastrado";
-            } else {
-                $cadastro = $model->alterarProduto();
+            $cadastro = $model->alterarProduto();
+
+            if ($cadastro) {
                 http_response_code(201);
                 $retorno['mensagem'] = "Produto alterado com sucesso";
+            } else {
+                http_response_code(400);
+                $retorno['erro'] = "Erro ao alterar produto";
             }
         }
     } catch (\Exception $e) {

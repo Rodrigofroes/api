@@ -72,10 +72,10 @@ class ProdutoModel
         $conexao = new Conexao();
         $sql = "SELECT * FROM tb_produto WHERE pro_codigo = :codigo";
         $stmt = $conexao->select($sql, [':codigo' => $this->codigo]);
-        if (count($stmt) == 0) {
-            return false;
-        } else {
+        if ($this->codigo == $stmt[0]['pro_codigo']) {
             return true;
+        } else {
+            return false;
         }
     }
 
