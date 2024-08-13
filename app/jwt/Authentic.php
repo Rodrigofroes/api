@@ -1,5 +1,7 @@
 <?php
+
 namespace App\jwt;
+
 require_once "../../vendor/autoload.php";
 
 use Firebase\JWT\JWT;
@@ -13,9 +15,12 @@ class Authentic
 {
     public static function gerarToken($payload)
     {
-        $key = $_ENV['SECRET_KEY'];
-        $jwt = JWT::encode($payload, $key, 'HS256');
-        return $jwt;
+        try {
+            $token = JWT::encode($payload, $_ENV['SECRET_KEY'], 'HS256');
+            return $token;
+        } catch (\Exception $e) {
+            return false;
+        }
     }
 
     public static function decodeToken($token)

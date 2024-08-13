@@ -2,6 +2,11 @@
 require_once "../../vendor/autoload.php";
 
 use App\models\NotaFiscalModel;
+use App\webhook\Servicos;
+use Dotenv\Dotenv;
+
+$dotenv = Dotenv::createImmutable(__DIR__ . '/../../');
+$dotenv->load();
 
 date_default_timezone_set('America/Sao_Paulo');
 
@@ -18,12 +23,12 @@ function webNota()
     $message = [];
     foreach ($retorno as $key => $value) {
         $data_vencimento = new DateTime($value['nota_data_vencimento']);
-        $data_atual = new DateTime(); // Certifique-se de definir a data atual se ainda não estiver definida
+        $data_atual = new DateTime();
         $intervalo = $data_atual->diff($data_vencimento);
 
         $dias_restantes = $intervalo->days + 1;
         if ($data_vencimento < $data_atual) {
-            $dias_restantes = -$intervalo->days; // Se a data de vencimento for passada, use o valor negativo
+            $dias_restantes = -$intervalo->days;
         }
 
         $numero = $value['nota_num'];
@@ -43,18 +48,7 @@ function webNota()
 }
 
 $retorno = webNota();
-$ch = curl_init();
-
 $text['text'] = $retorno;
 $json = json_encode($text);
-
-curl_setopt($ch, CURLOPT_URL, 'https://server-n8n-rodrigo.uwqcav.easypanel.host/webhook-test/0e1bc2f7-b2ef-4eba-803e-fe05667f906b');
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
-curl_setopt($ch, CURLOPT_POSTFIELDS, $json);
-curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
-
-$response = curl_exec($ch);
-curl_close($ch);
-
-echo json_encode($retorno);
+$model = new Servicos($_ENV['N8N_URL'], "POST", $json);
+$message = $model->sendMessage();
